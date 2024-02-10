@@ -273,7 +273,11 @@ const MapHandler = {
           assertText(value)
           const text = context.putObject(objectId, key, "")
           const proxyText = textProxy(context, text, [...path, key])
-          proxyText.splice(0, 0, ...value)
+
+          const chunkSize = 8 * 1024
+          for (let chunk = 0; chunk < value.length; chunk += chunkSize) {
+            proxyText.splice(chunk, 0, ...value.slice(chunk, chunk + chunkSize))
+          }
         }
         break
       }

@@ -1,6 +1,7 @@
 import * as assert from "assert"
 import * as Automerge from "../src/index.js"
 import { assertEqualsOneOf } from "./helpers.js"
+import crypto from 'node:crypto';
 
 type DocType = { text: Automerge.Text; [key: string]: any }
 
@@ -12,6 +13,16 @@ describe("Automerge.Text", () => {
       doc => (doc.text = new Automerge.Text()),
     )
     s2 = Automerge.merge(Automerge.init(), s1)
+  })
+
+  it("should support creation from large strings", () => {
+    const largeString = crypto.randomBytes(512000).toString('base64');
+
+    s1 = Automerge.change(s1, doc => {
+      doc.largeText = new Automerge.Text(largeString);
+    });
+
+    assert.strictEqual(s1.largeText.toString(), largeString);
   })
 
   it("should support insertion", () => {
